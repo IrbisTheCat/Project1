@@ -4,7 +4,7 @@ package edu.towson.cis.cosc455.ashche1.project1
 class MyLexicalAnalyzer extends LexicalAnalyzer {
   var position: Int = 0
   var SourceLine: String = ""
-  var nextChar: Char = _
+  var nextChar: Char = ' '
   var lexeme = new StringBuilder;
 
   /*
@@ -23,60 +23,47 @@ class MyLexicalAnalyzer extends LexicalAnalyzer {
     // Ignore spaces and add the first character to the token
     getNonBlank()
 
-    // Continue gathering characters for the token
-    while (nextChar != 4) {
 
-      if(nextChar == '\\' ) { //consume aplhanum
-        lexeme.append(nextChar)
+    var break = false
+      while (
+        !break
+        && !(CONSTANTS.lexems contains nextChar)
+        && !(CONSTANTS.whiteSpace contains nextChar)
+        && !(CONSTANTS.lexems contains lexeme.toString())
+        && nextChar != 4
+      ) {
+        lexeme append nextChar
         getChar()
-        while(CONSTANTS.letters.contains(nextChar)) {
-          lexeme.append(nextChar)
-          getChar()
-        }
-        if(lookup(lexeme.toString())) {
-          Compiler.currentToken = lexeme.toString()
-          Compiler.Parser.gittex()
-        } else {
-          print( s"Unknown token {lexeme.toString()}")
-          sys.exit(1)
+        if (nextChar == ']' || nextChar == ')'|| nextChar == '\r'|| nextChar == '\n') {
+          break = true
         }
       }
 
-      if(nextChar == '#') {
-        while ( (nextChar != 4) && (nextChar != '\r') && (nextChar != '\n')) {
-          getChar()
-          lexeme.append(nextChar)
-        }
-        Compiler.currentToken = lexeme.toString()
-        Compiler.Parser.heading()
-      }
+    // Convert the gathered character array token into a String
+    val newToken = lexeme.toString()
 
-      if(nextChar == '+') {
-        while ( (nextChar != 4) && (nextChar != '\r') && (nextChar != '\n')) {
-          getChar()
-          lexeme.append(nextChar)
-        }
-        Compiler.currentToken = lexeme.toString()
-        Compiler.Parser.listItem()
-      }
+    //if (lookup(newToken)) Compiler.currentToken_$eq(newToken)
+    Compiler.currentToken = newToken
+  }
 
-      if(nextChar == '[') {
-        while ( (nextChar != ']') ) {
-          getChar()
-          lexeme.append(nextChar)
-        }
-        Compiler.currentToken = lexeme.toString()
-        Compiler.Parser.listItem()
-      }
+  def getText(): Unit = {
+    lexeme.clear()
 
-      addChar()
+
+    var break = false
+    while (
+        (CONSTANTS.validText contains nextChar)
+        && nextChar != 4
+    ) {
+      lexeme append nextChar
       getChar()
     }
 
     // Convert the gathered character array token into a String
     val newToken = lexeme.toString()
 
-    if (lookup(newToken)) Compiler.currentToken_$eq(newToken)
+    //if (lookup(newToken)) Compiler.currentToken_$eq(newToken)
+    Compiler.currentToken = newToken
   }
 
   override def lookup(candidateToken: String): Boolean = {
@@ -89,18 +76,24 @@ class MyLexicalAnalyzer extends LexicalAnalyzer {
       position += 1; position - 1
     })
     else nextChar = 4  //EOF
+    //print(nextChar)
     nextChar
   }
 
   // A helper method to determine if the current character is a space.
   def isSpace(c: Char) = c == ' '
 
+  def isNl(c: Char) = c == '\r' || c == '\n'
+
   // A helper method to get the next non-blank character.
   def getNonBlank(): Unit = {
     while ( {
-      isSpace(nextChar)
+      isSpace(nextChar) || isNl(nextChar)
     }) getChar()
   }
 
+  def peek(): Char = {
+    if (position < SourceLine.length) SourceLine.charAt(position) else 4  //EOF
+  }
 }
 

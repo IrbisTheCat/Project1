@@ -10,7 +10,7 @@ trait SyntaxAnalyzer {
   def variableDefine() : Unit
   def variableUse() : Unit
   def bold() : Unit
- // def italics() : Unit
+  def italics() : Unit
   def listItem() : Unit
   def innerItem() : Unit
   def link() : Unit

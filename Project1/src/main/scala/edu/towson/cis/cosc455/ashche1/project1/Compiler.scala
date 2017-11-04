@@ -1,4 +1,10 @@
 package edu.towson.cis.cosc455.ashche1.project1
+import java.io.PrintWriter
+import java.io.File
+
+import java.awt.Desktop
+import java.io.{File, IOException}
+
 
 import scala.collection.mutable.ListBuffer
 
@@ -9,7 +15,7 @@ object Compiler {
 
   val Scanner = new MyLexicalAnalyzer
   val Parser = new MySyntaxAnalyzer
-  val SemanticAnalyzer = new MySyntaxAnalyzer
+  val SemanticAnalyzer = new MySemanticAnalyzer
 
   def main(args: Array[String]): Unit = {
     //checks argumens
@@ -20,6 +26,16 @@ object Compiler {
 
    Scanner.getNextToken()
 
+    Parser.gittex()
+    if(!Parser.errorFound){
+      SemanticAnalyzer.generate(Parser.ast)
+      val result = SemanticAnalyzer.result()
+      print(result)
+      val writer = new PrintWriter(new File("output.html"))
+      writer.write(result)
+      writer.close()
+      openHTMLFileInBrowser("output.html")
+    }
 
   }
 
@@ -36,6 +52,20 @@ object Compiler {
     else if (! args(0).endsWith(".mkd")) {
       println("USAGE ERROR: wrong extension fool!")
       System.exit(1)
+    }
+  }
+  def openHTMLFileInBrowser(htmlFileStr : String) = {
+    val file : File = new File(htmlFileStr.trim)
+    println(file.getAbsolutePath)
+    if (!file.exists())
+      sys.error("File " + htmlFileStr + " does not exist.")
+
+    try {
+      Desktop.getDesktop.browse(file.toURI)
+    }
+    catch {
+      case ioe: IOException => sys.error("Failed to open file:  " + htmlFileStr)
+      case e: Exception => sys.error("He's dead, Jim!")
     }
   }
 }
