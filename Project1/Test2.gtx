@@ -12,7 +12,4 @@
 	Here is a picture:
 	\\
 	![The Simpsons] (https://upload.wikimedia.org/wikipedia/en/0/0d/Simpsons_FamilyPicture.png)
-\END
-	\PARAB
-		This shouldn't be here.
-	\PARAE
+\END	

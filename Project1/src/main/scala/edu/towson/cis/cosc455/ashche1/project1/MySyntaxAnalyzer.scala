@@ -10,6 +10,8 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
 
   var ast: Ast = _
 
+
+
   override def gittex(): Unit = {
     if (Compiler.currentToken.equalsIgnoreCase(CONSTANTS.DOCB)) {
       // add to parse tree / stack
@@ -34,6 +36,11 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
       errorFound = true
       println(s"Error: current token is ${Compiler.currentToken} expected ${CONSTANTS.DOCB}")
     }
+
+   /* if(Compiler.Scanner.getNextToken()!=""){
+      errorFound = true
+      println("This Stuff should not be there!")
+    }*/
   }
 
   override def paragraph(): Unit = {
@@ -58,6 +65,11 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
       }
 
     }
+    if (Compiler.currentToken equalsIgnoreCase CONSTANTS.PARAE){
+      errorFound = true
+      print("PARAB expected! PARAE instead")
+      System.exit(0)
+    }
   }
 
   override def innerItem(): Unit = {
@@ -71,13 +83,16 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
       if( !Compiler.Scanner.lookup(freetext) ) { //if it's not a token
         nodesStack.top.push( new TextNode(freetext))
 
+        val last = Compiler.Scanner.nextChar
+
         Compiler.Scanner.getNextToken()
-        innerText()
+        if( last != '\n' && last != '\r') {
+          innerItem()
+        }
       }
     }
     context.pop()
   }
-
   override def innerText(): Unit = {
     context.push( innerText)
     if (!errorFound) variableUse()
@@ -89,11 +104,16 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
     if (!errorFound) {
       //TODO: check if the text is valid
       val freetext = Compiler.currentToken
-      if( !Compiler.Scanner.lookup(freetext) ) { //if it's not a token
+      if( !Compiler.Scanner.lookup(freetext.toUpperCase)) { //if it's not a token do stuff
         nodesStack.top.push( new TextNode(freetext))
-
         Compiler.Scanner.getNextToken()
         innerText()
+      }
+      //if its not a token and pretends to be a token
+      if(freetext.charAt(0)=='\\' && !Compiler.Scanner.lookup(freetext.toUpperCase)){
+        errorFound = true
+        println(s"Error: current token is ${Compiler.currentToken}" )
+        System.exit(0)
       }
     }
     context.pop()
@@ -101,7 +121,7 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
 
   override def link(): Unit = {
     if (Compiler.currentToken equalsIgnoreCase CONSTANTS.LINKB) {
-      Compiler.Scanner.getNextToken()
+      Compiler.Scanner.getText()
       //TODO: check if the text is valid and is there to begin with
       val freetext = Compiler.currentToken
       Compiler.Scanner.getNextToken()
@@ -149,17 +169,15 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
   }
 
   override def bold(): Unit = {
-    if (Compiler.currentToken equalsIgnoreCase CONSTANTS.BOLD) {
-      Compiler.Scanner.getNextToken()
-      //TODO: check if text is valid or if its there at all. for now lets just assume that text must be there
-      val freeText = Compiler.currentToken
+    if (Compiler.currentToken.equalsIgnoreCase(CONSTANTS.BOLD)) {
+      //the Text
       Compiler.Scanner.getText()
-      val bld = Compiler.currentToken
-      if (Compiler.currentToken equalsIgnoreCase CONSTANTS.BOLD) {
-        nodesStack.top.push( new BoldNode(bld) )
-
+      val boldText = Compiler.currentToken
+      Compiler.Scanner.getNextToken()
+      val star = Compiler.currentToken
+      if (star.equalsIgnoreCase(CONSTANTS.BOLD)) {
         Compiler.Scanner.getNextToken()
-        context.top()
+        nodesStack.top.push( new BoldNode(boldText) )
       } else {
         errorFound = true
         print("Bold expected!")
@@ -168,10 +186,11 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
   }
 
   override def newline(): Unit = {
-    if (Compiler.currentToken.equalsIgnoreCase("\n")) {
+    if (Compiler.currentToken.equalsIgnoreCase(CONSTANTS.NEWLINE)) {
       nodesStack.top.push( new NewLineNode() )
 
       Compiler.Scanner.getNextToken()
+      innerText()
     }
   }
 
@@ -202,6 +221,8 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
       if (eqSign.equalsIgnoreCase(CONSTANTS.EQSIGN)) {
         Compiler.Scanner.getNextToken()
         val varValue = Compiler.currentToken
+
+
         Compiler.Scanner.getNextToken()
         val brackete = Compiler.currentToken
         if (brackete.equalsIgnoreCase(CONSTANTS.BRACKETE)) {
@@ -223,7 +244,7 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
 
   override def image(): Unit = {
     if (Compiler.currentToken equalsIgnoreCase CONSTANTS.IMAGEB) {
-      Compiler.Scanner.getNextToken()
+      Compiler.Scanner.getText()
       val freetext = Compiler.currentToken
       //TODO: check if text is there, it is required
       Compiler.Scanner.getNextToken()
@@ -284,24 +305,30 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
   override def heading(): Unit = {
     if (Compiler.currentToken equalsIgnoreCase CONSTANTS.HEADING) {
       Compiler.Scanner.getText()
-      val freetext = Compiler.currentToken
-      Compiler.Scanner.getNextToken()
+
       //Text is required
-        //TODO: check if we have any text
-        nodesStack.top.push( new HeadingNode(freetext) )
+      val freetext = Compiler.currentToken
+      //TODO: check if we have any text
+
+      nodesStack.top.push( new HeadingNode(freetext) )
+
+      innerText()
     }
   }
 
   override def listItem(): Unit = {
     if(Compiler.currentToken equalsIgnoreCase CONSTANTS.LISTITEM){
       Compiler.Scanner.getNextToken()
+      //while(Compiler.currentToken!="\n"  )
+      //while(Compiler.Scanner.nextChar!='\n' && Compiler.Scanner.nextChar!='\r'){
+      //Compiler.Scanner.getChar()
+      //}
+      //Compiler.Scanner.getNextToken()
       if (!errorFound) {
-        nodesStack.push( new Stack[Ast]() )
+        nodesStack.push(new Stack[Ast]())
         innerItem()
-
-        val list =  nodesStack.pop()
-        nodesStack.top.push( new ListItemNode( list.toList reverse) )
-
+        val list = nodesStack.pop()
+        nodesStack.top.push(new ListItemNode(list.toList reverse))
         listItem()
       }
     }

@@ -13,7 +13,7 @@ class MyLexicalAnalyzer extends LexicalAnalyzer {
 	case.
 	*/
   override def addChar(): Unit = {
-      lexeme.append(nextChar)
+    lexeme.append(nextChar)
   }
   // override def lookup(): Boolean = ???
 
@@ -25,19 +25,19 @@ class MyLexicalAnalyzer extends LexicalAnalyzer {
 
 
     var break = false
-      while (
-        !break
-        && !(CONSTANTS.lexems contains nextChar)
+    while (
+      !break
+        && !(CONSTANTS.lexems contains lexeme.toString)
         && !(CONSTANTS.whiteSpace contains nextChar)
         && !(CONSTANTS.lexems contains lexeme.toString())
         && nextChar != 4
-      ) {
-        lexeme append nextChar
-        getChar()
-        if (nextChar == ']' || nextChar == ')'|| nextChar == '\r'|| nextChar == '\n') {
-          break = true
-        }
+    ) {
+      lexeme append nextChar
+      getChar()
+      if (nextChar == ']' || nextChar == ')'|| nextChar == '\r'|| nextChar == '\n') {
+        break = true
       }
+    }
 
     // Convert the gathered character array token into a String
     val newToken = lexeme.toString()
@@ -52,7 +52,7 @@ class MyLexicalAnalyzer extends LexicalAnalyzer {
 
     var break = false
     while (
-        (CONSTANTS.validText contains nextChar)
+      (CONSTANTS.validText contains nextChar)
         && nextChar != 4
     ) {
       lexeme append nextChar
@@ -88,12 +88,22 @@ class MyLexicalAnalyzer extends LexicalAnalyzer {
   // A helper method to get the next non-blank character.
   def getNonBlank(): Unit = {
     while ( {
-      isSpace(nextChar) || isNl(nextChar)
+      isSpace(nextChar) || isNl(nextChar)  || nextChar == '\t'
     }) getChar()
   }
 
   def peek(): Char = {
     if (position < SourceLine.length) SourceLine.charAt(position) else 4  //EOF
   }
-}
 
+  def readUntilEnd() : Unit = {
+    while (nextChar!='\r' && nextChar!='\n'){
+      lexeme.append(getChar())
+    }
+    // Convert the gathered character array token into a String
+    val newToken = lexeme.toString()
+
+    //if (lookup(newToken)) Compiler.currentToken_$eq(newToken)
+    Compiler.currentToken = newToken
+  }
+}

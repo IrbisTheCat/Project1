@@ -8,6 +8,8 @@ class MySemanticAnalyzer {
 
   val context = new Stack[HashMap[String, String]]
 
+  var inAList = false
+
   def generate(ast: Ast): Unit = {
     ast match {
       case DocumentNode(innerNodes) => {
@@ -23,9 +25,12 @@ class MySemanticAnalyzer {
       }
 
       case TitleNode(text) => {
-        builder.append("<title>")
+        builder.append("<head>")
+          .append("<title>")
           .append(text)
-          .append("</title>")}
+          .append("</title>")
+          .append("</head>")
+      }
 
       case TextNode(text) => {
         builder.append(text)
@@ -45,18 +50,19 @@ class MySemanticAnalyzer {
         context.pop()
       }
 
-        //
-      case HeadingNode(test) => {
-        builder.append("<head>")
-          .append(test)
-          .append("</head>")
 
+      case HeadingNode(test) => {
+        builder.append("<h1>")
+               .append(test)
+               .append("</h1>")
       }
+
       case BoldNode(text)=>{
         builder.append("<b>")
           .append(text)
           .append("</b>")
       }
+
       case NewLineNode()=>{
         builder.append("\n")
       }
@@ -74,25 +80,38 @@ class MySemanticAnalyzer {
         builder.append("\">")
         builder.append(text)
         builder.append("</a>")
+        builder.append(" ")
 
       }
 
 
-      case ListItemNode(innerNodes)=>{
+      case ListItemNode(innerNodes) if !inAList =>{
         context.push(new mutable.HashMap[String, String]())
         builder.append("<li>")
-        for(node <- innerNodes) { generate(node); }
+        inAList = true
+        for(node <- innerNodes) {
+          generate(node);
+          }
+        inAList = false
         builder.append("</li>")
         context.pop()
     }
 
-      // TODO: complete patterns for all other case classes
+      case ListItemNode(innerNodes) if inAList =>{
+        context.push(new mutable.HashMap[String, String]())
+        builder.append("</li><li>")
+        for(node <- innerNodes) {
+          generate(node);
+        }
+        //if(inAList) builder.append("</li>")
+        context.pop()
+      }
     }
 
   }
   def lookup(name:String): String = {
     val variable = context.find( d => d.contains(name))
-    if(variable == null) {
+    if(variable == null || variable.toString=="None") {
       print(s"ERROR: No variable $name is defined")
       sys.exit(1)
     }
