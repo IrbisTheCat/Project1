@@ -34,12 +34,12 @@ class MySemanticAnalyzer {
 
       case TextNode(text) => {
         builder.append(text)
-          .append(" ") //???
+          .append(" ")
       }
 
       case VarUseNode(name) => {
         builder.append(lookup(name))
-          .append(" ") //???
+          .append(" ")
       }
 
       case ParagraphNode(innerNodes) => {
@@ -117,6 +117,7 @@ class MySemanticAnalyzer {
     }
     variable.get(name)
   }
+
 
   def result(): String = { builder toString }
 }

@@ -1,5 +1,7 @@
 package edu.towson.cis.cosc455.ashche1.project1
 
+/**This object contains all of the valid characters allowed in our program*/
+
 object CONSTANTS {
   val letters : List[Char] = ('A' to 'Z' toList) ::: ('a' to 'z' toList)
   val numbersEtc : List[Char] = List('1','2','3','4','5','6','7','8','9','0',
