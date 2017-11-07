@@ -48,7 +48,7 @@ Yay! It has extra space around variable tho
 Test8.gtx 
 A test case to ensure if there are annotations after \END 
 are reported as syntax errors.
-Issues
+Yay!
 
 Test9.gtx
 A test case using multiple variable definition and use tags to 

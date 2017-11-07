@@ -31,7 +31,15 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
         errorFound = true
         println(s"Error: current token is ${Compiler.currentToken} expected ${CONSTANTS.DOCE}")
       }
+
+      if (Compiler.Scanner.nextChar!='\u0004'){
+        errorFound=true
+        println("It shouldn't be there!")
+      }
+
     }
+
+
     else {
       errorFound = true
       println(s"Error: current token is ${Compiler.currentToken} expected ${CONSTANTS.DOCB}")
