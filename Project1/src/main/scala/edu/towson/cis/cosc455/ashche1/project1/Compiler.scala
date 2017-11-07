@@ -49,7 +49,7 @@ object Compiler {
       println("USAGE ERROR: wrong number of args fool!")
       System.exit(1)
     }
-    else if (! args(0).endsWith(".mkd")) {
+    else if (! args(0).endsWith(".gtx")) {
       println("USAGE ERROR: wrong extension fool!")
       System.exit(1)
     }
