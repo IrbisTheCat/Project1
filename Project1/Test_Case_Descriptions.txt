@@ -7,7 +7,7 @@ Test cases will be graded as follows:
 Test1.txt
 A simple test case with a .txt extension to test that your
 compiler only accepts .gtx files.
-?
+yay
 
 Test2.gtx
 A simple test case containing only markdown annotations (i.e., 

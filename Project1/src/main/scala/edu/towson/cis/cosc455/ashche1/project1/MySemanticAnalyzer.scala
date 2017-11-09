@@ -112,7 +112,7 @@ class MySemanticAnalyzer {
   def lookup(name:String): String = {
     val variable = context.find( d => d.contains(name))
     if(variable == null || variable.toString=="None") {
-      print(s"ERROR: No variable $name is defined")
+      print(s"STATIC SEMANTIC ERROR: No variable $name is defined")
       sys.exit(1)
     }
     variable.get(name)

@@ -28,19 +28,25 @@ object Compiler {
     checkFile(args)
     readFile(args(0))
 
+    val fileName : String = args(0)
+    val fileName2=fileName.substring(0, fileName.length-4)+".html"
+
+
     Scanner.SourceLine = fileContents;
 
     Scanner.getNextToken()
 
     Parser.gittex()
+
+
     if (!Parser.errorFound) {
       SemanticAnalyzer.generate(Parser.ast)
       val result = SemanticAnalyzer.result()
       print(result)
-      val writer = new PrintWriter(new File("output.html"))
+      val writer = new PrintWriter(new File(fileName2))
       writer.write(result)
       writer.close()
-      openHTMLFileInBrowser("output.html")
+      openHTMLFileInBrowser(fileName2)
     }
 
   }

@@ -22,9 +22,7 @@ class MyLexicalAnalyzer extends LexicalAnalyzer {
   override def getNextToken(): Unit = {
     lexeme.clear()
 
-    // Ignore spaces and add the first character to the token
     getNonBlank()
-
 
     var break = false
     while (
@@ -41,10 +39,8 @@ class MyLexicalAnalyzer extends LexicalAnalyzer {
       }
     }
 
-    // Convert the gathered character array token into a String
     val newToken = lexeme.toString()
 
-    //if (lookup(newToken)) Compiler.currentToken_$eq(newToken)
     Compiler.currentToken = newToken
   }
 
@@ -61,10 +57,8 @@ class MyLexicalAnalyzer extends LexicalAnalyzer {
       getChar()
     }
 
-    // Convert the gathered character array token into a String
     val newToken = lexeme.toString()
 
-    //if (lookup(newToken)) Compiler.currentToken_$eq(newToken)
     Compiler.currentToken = newToken
   }
 
@@ -73,7 +67,19 @@ class MyLexicalAnalyzer extends LexicalAnalyzer {
     * @param candidateToken token to be checked */
 
   override def lookup(candidateToken: String): Boolean = {
-    CONSTANTS.lexems.contains(candidateToken)
+    if (!CONSTANTS.lexems.contains(candidateToken)) {
+      if(candidateToken.length>1) {
+        if (candidateToken.charAt(0) == '\\' && candidateToken.charAt(1) != '\\') {
+          println(s"Lexical Error! Token $candidateToken is invalid!")
+          System.exit(0)
+        }
+      }
+
+      return false
+    }
+    return true
+
+
   }
 
   /** This method gets the next character from the "program" string. */
