@@ -11,7 +11,12 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
   var ast: Ast = _
 
 
-
+/**Top level method that starts syntax analyzer
+  *checks Document beginning, end tag and whether there is anything after
+  *the document closing tag
+  * Syntax analyzer is responsible for checking whether document following syntax rules
+  * and generates ast
+  **/
   override def gittex(): Unit = {
     if (Compiler.currentToken.equalsIgnoreCase(CONSTANTS.DOCB)) {
       // add to parse tree / stack
@@ -54,6 +59,8 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
 
   }
 
+
+  /**The method is responsible for unparsing paragraph*/
   override def paragraph(): Unit = {
     if (Compiler.currentToken equalsIgnoreCase CONSTANTS.PARAB) {
       Compiler.Scanner.getNextToken()
@@ -84,6 +91,8 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
     }
   }
 
+  /**Method responisble for unparsing inner items
+    */
   override def innerItem(): Unit = {
     context.push(innerItem)
     if (!errorFound) variableUse()
@@ -106,6 +115,10 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
     }
     context.pop()
   }
+
+
+  /**Method responisble for unparsing inner text
+    */
   override def innerText(): Unit = {
     context.push( innerText)
     if (!errorFound) variableUse()
@@ -129,6 +142,7 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
     context.pop()
   }
 
+  /**Methid responsibe for unparsing links*/
   override def link(): Unit = {
     if (Compiler.currentToken equalsIgnoreCase CONSTANTS.LINKB) {
       Compiler.Scanner.getText()
@@ -170,6 +184,7 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
     }
   }
 
+  /**We don't actually need italics*/
   override def italics(): Unit = {} // Requred by trait, so just add stub
 
   override def body(): Unit = {
@@ -178,6 +193,7 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
     if (!errorFound) newline()
   }
 
+  /**Method for unparsing bold text*/
   override def bold(): Unit = {
     if (Compiler.currentToken.equalsIgnoreCase(CONSTANTS.BOLD)) {
       //the Text
@@ -195,6 +211,7 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
     }
   }
 
+  /**Method for unparsing newline*/
   override def newline(): Unit = {
     if (Compiler.currentToken.equalsIgnoreCase(CONSTANTS.NEWLINE)) {
       nodesStack.top.push( new NewLineNode() )
@@ -204,6 +221,7 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
     }
   }
 
+  /**Method for unparsing title*/
   override def title(): Unit = {
     if (Compiler.currentToken.equalsIgnoreCase(CONSTANTS.TITLEB)) {
       Compiler.Scanner.getText()
@@ -222,6 +240,7 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
     }
   }
 
+  /**Method for unparsing variable definition*/
   override def variableDefine(): Unit = {
     if (Compiler.currentToken.equalsIgnoreCase(CONSTANTS.DEFB)) {
       Compiler.Scanner.getNextToken()
@@ -252,6 +271,7 @@ class MySyntaxAnalyzer extends SyntaxAnalyzer {
     }
   }
 
+  /**Method for unparsing errors*/
   override def image(): Unit = {
     if (Compiler.currentToken equalsIgnoreCase CONSTANTS.IMAGEB) {
       Compiler.Scanner.getText()

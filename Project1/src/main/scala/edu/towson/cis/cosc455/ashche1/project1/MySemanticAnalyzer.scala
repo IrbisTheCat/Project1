@@ -3,6 +3,7 @@ package edu.towson.cis.cosc455.ashche1.project1
 import scala.collection.mutable
 import scala.collection.mutable.{HashMap, Stack}
 
+/**The class is responsible for convering gittex into html*/
 class MySemanticAnalyzer {
   val builder = new StringBuilder
 
@@ -10,6 +11,7 @@ class MySemanticAnalyzer {
 
   var inAList = false
 
+  /**Generates html from ast*/
   def generate(ast: Ast): Unit = {
     ast match {
       case DocumentNode(innerNodes) => {
@@ -109,6 +111,10 @@ class MySemanticAnalyzer {
     }
 
   }
+
+  /**Checks if variable value exists
+    * @param name name of variable
+    * @return value of the variable*/
   def lookup(name:String): String = {
     val variable = context.find( d => d.contains(name))
     if(variable == null || variable.toString=="None") {
